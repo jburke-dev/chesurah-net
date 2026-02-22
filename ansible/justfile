@@ -4,20 +4,5 @@ encrypt-var NAME:
 debug:
     ansible-playbook --inventory inventory.yml --ask-vault-pass debug-playbook.yml
 
-network:
-    ansible-playbook --inventory inventory.yml --ask-vault-pass network-playbook.yml
-
-network-technitium:
-    ansible-playbook --inventory inventory.yml --ask-vault-pass --limit technitium network-playbook.yml
-
-network-caddy:
-    ansible-playbook --inventory inventory.yml --ask-vault-pass --limit caddy network-playbook.yml
-
-proxmox:
-    ansible-playbook --inventory inventory.yml --ask-vault-pass --limit proxmox network-playbook.yml
-
-docker:
-    ansible-playbook --inventory inventory.yml --ask-vault-pass --limit docker network-playbook.yml
-
 limit HOST:
     ansible-playbook --inventory inventory.yml --ask-vault-pass --limit {{ HOST }} network-playbook.yml
