@@ -1,0 +1,21 @@
+- name: Prep cloud images
+  hosts: proxmox
+  roles:
+    - prep_cloudinit
+
+- name: Setup Docker
+  hosts: docker
+  become: true
+  roles:
+    - install_docker
+
+- name: Run infra containers
+  hosts: infra-docker
+  become: true
+  roles:
+    - run_infra_containers
+
+- name: Configure infra
+  hosts: infra-docker
+  roles:
+    - dns

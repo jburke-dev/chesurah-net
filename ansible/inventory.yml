@@ -1,0 +1,6 @@
+proxmox:
+  hosts:
+    pve-pandora:
+docker:
+  hosts:
+    infra-docker:

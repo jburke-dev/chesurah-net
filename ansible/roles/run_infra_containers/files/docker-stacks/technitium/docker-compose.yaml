@@ -1,0 +1,21 @@
+services:
+  dns-server:
+    container_name: technitium
+    hostname: technitium
+    image: technitium/dns-server:latest
+    ports:
+      - "53:53/udp"
+      - "53:53/tcp"
+      - "5380:5380"
+    restart: unless-stopped
+    volumes:
+      - technitium-config:/etc/dns
+    networks:
+      - reverse-proxy
+
+volumes:
+  technitium-config:
+
+networks:
+  reverse-proxy:
+    external: true

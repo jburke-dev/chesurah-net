@@ -1,0 +1,48 @@
+- name: get list of zone records
+  ansible.builtin.uri:
+    url: "{{ base_address }}/api/zones/records/get"
+    method: POST
+    body_format: form-urlencoded
+    body:
+      token: "{{ technitium_api_token }}"
+      domain: "{{ zone.value.domain }}"
+      listZone: true
+  register: records_resp
+
+- name: set zone records
+  ansible.builtin.set_fact:
+    records: "{{ records_resp.json.response.records | map(attribute='name') }}"
+
+- name: create missing zone cname records
+  ansible.builtin.uri:
+    url: "{{ base_address }}/api/zones/records/add"
+    method: POST
+    body_format: form-urlencoded
+    body:
+      token: "{{ technitium_api_token }}"
+      zone: "{{ zone.value.domain }}"
+      type: CNAME
+      domain: "{{ record.name }}.{{ zone.value.domain }}"
+      cname: "{{ record.cname }}"
+  when: (record.name + "." + zone.value.domain) not in records
+  loop: "{{ zone.value.cnames }}"
+  loop_control:
+    label: "{{ record.name }}"
+    loop_var: record
+
+- name: create missing zone a records
+  ansible.builtin.uri:
+    url: "{{ base_address }}/api/zones/records/add"
+    method: POST
+    body_format: form-urlencoded
+    body:
+      token: "{{ technitium_api_token }}"
+      zone: "{{ zone.value.domain }}"
+      type: A
+      domain: "{{ record.name }}.{{ zone.value.domain }}"
+      ipAddress: "{{ record.ipv4 }}"
+  when: (record.name + "." + zone.value.domain) not in records
+  loop: "{{ zone.value.a }}"
+  loop_control:
+    label: "{{ record.name }}"
+    loop_var: record

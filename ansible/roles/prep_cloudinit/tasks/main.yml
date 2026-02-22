@@ -1,0 +1,7 @@
+- name: Write user cloud config snippet
+  ansible.builtin.template:
+    src: "user.yaml.j2"
+    dest: "/var/lib/vz/snippets/user.yaml"
+    owner: root
+    group: root
+    mode: "0644"

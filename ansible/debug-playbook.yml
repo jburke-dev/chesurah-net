@@ -1,0 +1,6 @@
+- name: output home
+  hosts: infra-docker
+  tasks:
+    - name: output home
+      ansible.builtin.debug:
+        var: ansible_facts

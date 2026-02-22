@@ -1,0 +1,33 @@
+- name: Update DNS configuration
+  block:
+    - name: Disable systemd resolved
+      ansible.builtin.systemd_service:
+        name: systemd-resolved
+        state: stopped
+        enabled: false
+
+    - name: Overwrite /etc/resolv.conf
+      ansible.builtin.copy:
+        src: resolv.conf
+        dest: /etc/resolv.conf
+        force: true
+        owner: root
+        group: root
+        mode: "0644"
+
+- name: Create reverse proxy network
+  community.docker.docker_network:
+    name: reverse-proxy
+
+- name: Copy docker compose stacks
+  ansible.builtin.copy:
+    src: docker-stacks/
+    dest: /home/jburke/docker-stacks
+    owner: jburke
+    group: jburke
+    mode: '0644'
+
+- name: Run Technitium
+  community.docker.docker_compose_v2:
+    project_src: /home/jburke/docker-stacks/technitium
+    remove_orphans: true

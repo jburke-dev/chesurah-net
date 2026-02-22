@@ -1,0 +1,33 @@
+- name: get list of zones
+  ansible.builtin.uri:
+    url: "{{ base_address }}/api/zones/list"
+    method: POST
+    body_format: form-urlencoded
+    body:
+      token: "{{ technitium_api_token }}"
+  register: existing_zones_resp
+
+- name: set existing zones
+  ansible.builtin.set_fact:
+    existing_zones: "{{ existing_zones_resp.json.response.zones | map(attribute='name') }}"
+
+- name: create missing zones
+  ansible.builtin.uri:
+    url: "{{ base_address }}/api/zones/create"
+    method: POST
+    body_format: form-urlencoded
+    body:
+      token: "{{ technitium_api_token }}"
+      domain: "{{ item.value.domain }}"
+      type: Primary
+  when: item.value.domain not in existing_zones
+  loop: "{{ zones | dict2items }}"
+  loop_control:
+    label: "{{ item.key }}"
+
+- name: update zones
+  ansible.builtin.include_tasks: ./zone.yml
+  loop: "{{ zones | dict2items(key_name='name') }}"
+  loop_control:
+    label: "{{ zone.name }}"
+    loop_var: zone
